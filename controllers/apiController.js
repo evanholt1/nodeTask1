@@ -122,7 +122,7 @@ exports.getadminRead = (req,res) => {
 
 };// end route
 
-exports.putadminUpdate = (req,res) => {
+exports.putadminUpdate =  (req,res) => {
   try {
     const {_id} = jwt.verify(req.cookies.id,process.env.TOKEN_SECRET);
     User.findOne({_id:_id},{},{runValidators: true, context: 'query'})
@@ -148,7 +148,9 @@ exports.putadminUpdate = (req,res) => {
                 user.username = req.body.username;
               }
                if(req.body.password !=="") {
-                user.password = req.body.password;
+                const salt =  bcrypt.genSaltSync(12);
+                const hashedPassword =  bcrypt.hashSync(req.body.password,salt);
+                user.password = hashedPassword;
               }
               user.save();
               req.app.locals.msg="User Updated";
